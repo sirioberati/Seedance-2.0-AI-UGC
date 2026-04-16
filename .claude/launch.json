@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ab-test-report",
+      "runtimeExecutable": "/opt/homebrew/bin/node",
+      "runtimeArgs": ["-e", "const h=require('http'),f=require('fs'),p=require('path'),root=process.env.HOME+'/Desktop/UGC-Ad-Pipeline',m={'html':'text/html','css':'text/css','js':'application/javascript','mp4':'video/mp4','mp3':'audio/mpeg','png':'image/png','jpg':'image/jpeg','jpeg':'image/jpeg','webp':'image/webp','svg':'image/svg+xml','webm':'video/webm','gif':'image/gif','json':'application/json'};h.createServer((q,r)=>{let u=decodeURIComponent(q.url.split('?')[0]);if(u==='/')u='/index.html';let fp=p.join(root,u),ext=p.extname(fp).slice(1);if(!f.existsSync(fp)){r.writeHead(404);r.end('Not found');return}const stat=f.statSync(fp);const range=q.headers.range;if(range&&(ext==='mp4'||ext==='mp3')){const parts=range.replace(/bytes=/,'').split('-');const start=parseInt(parts[0],10);const end=parts[1]?parseInt(parts[1],10):stat.size-1;r.writeHead(206,{'Content-Range':`bytes ${start}-${end}/${stat.size}`,'Accept-Ranges':'bytes','Content-Length':end-start+1,'Content-Type':m[ext]||'application/octet-stream'});f.createReadStream(fp,{start,end}).pipe(r)}else{r.writeHead(200,{'Content-Type':m[ext]||'application/octet-stream','Content-Length':stat.size,'Accept-Ranges':'bytes'});f.createReadStream(fp).pipe(r)}}).listen(8091,()=>console.log('Server running on http://localhost:8091'))"],
+      "port": 8091
+    },
+    {
+      "name": "asset-wizard-ui",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [".claude/skills/ab-test-pipeline/scripts/asset_server.py"],
+      "port": 8092
+    }
+  ]
+}

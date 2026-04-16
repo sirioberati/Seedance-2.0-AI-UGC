@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Center — UGC Ad Pipeline</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/app/styles.css">
+</head>
+<body>
+    <!-- Welcome Overlay -->
+    <div id="welcome-overlay" class="welcome-overlay" style="display:none">
+        <div class="welcome-card">
+            <div class="welcome-header">
+                <div class="welcome-badge">UGC Ad Pipeline</div>
+                <h1 class="welcome-title">Control Center</h1>
+                <p class="welcome-subtitle">Generate A/B tested AI video ads in minutes.<br>Powered by Seedance 2 on Enhancor.</p>
+            </div>
+
+            <div class="welcome-steps">
+                <div class="welcome-step-title">How It Works</div>
+
+                <div class="welcome-step">
+                    <div class="welcome-step-num">1</div>
+                    <div class="welcome-step-content">
+                        <div class="welcome-step-label">Set up your brand</div>
+                        <div class="welcome-step-desc">Go to Claude Code and set up your product, audience, and goals.</div>
+                        <div class="welcome-copy-row">
+                            <code class="welcome-command">/onboard</code>
+                            <button class="btn btn-sm btn-ghost" onclick="copyText('/onboard')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="welcome-step">
+                    <div class="welcome-step-num">2</div>
+                    <div class="welcome-step-content">
+                        <div class="welcome-step-label">Upload your assets</div>
+                        <div class="welcome-step-desc">Drag product images, influencer photos, and mood references into the zones on this dashboard. Then ask Claude to analyze them.</div>
+                        <div class="welcome-copy-row">
+                            <code class="welcome-command">analyze my new assets</code>
+                            <button class="btn btn-sm btn-ghost" onclick="copyText('analyze my new assets')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="welcome-step">
+                    <div class="welcome-step-num">3</div>
+                    <div class="welcome-step-content">
+                        <div class="welcome-step-label">Generate ads</div>
+                        <div class="welcome-step-desc">Claude generates 8 video variants across 4 formats. Results appear in the Outputs section below.</div>
+                        <div class="welcome-copy-row">
+                            <code class="welcome-command">/ab-test</code>
+                            <button class="btn btn-sm btn-ghost" onclick="copyText('/ab-test')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="welcome-api">
+                <div class="welcome-step-title">API Setup</div>
+                <p class="welcome-api-desc">You need an Enhancor API key to generate videos.</p>
+                <div class="welcome-pricing">
+                    <div class="welcome-price-row"><strong>Up to 65% off market price</strong> — cheapest Seedance 2 Full Access API. Full face generation enabled.</div>
+                    <div class="welcome-price-row"><strong>Seedance 2:</strong> 480p $0.089/s · 720p $0.189/s</div>
+                    <div class="welcome-price-row"><strong>Seedance 2 Fast:</strong> 480p $0.073/s · 720p $0.155/s</div>
+                    <div class="welcome-price-row"><strong>With Video Input:</strong> from $0.042/s. Failed gens refunded.</div>
+                </div>
+                <a href="https://app.enhancor.ai/api-dashboard" target="_blank" class="welcome-api-link">Get API Key at enhancor.ai</a>
+                <p class="welcome-api-hint">Copy your key → run <code>cp .env.example .env</code> → paste as <code>ENHANCOR_API_KEY</code></p>
+            </div>
+
+            <div class="welcome-formats">
+                <div class="welcome-step-title">Ad Formats</div>
+                <div class="welcome-format-grid">
+                    <div class="welcome-format"><span class="wf-name">Podcast Ad</span><span class="wf-spec">16:9 / 4-15s</span></div>
+                    <div class="welcome-format"><span class="wf-name">UGC Ad</span><span class="wf-spec">9:16 / 4-15s</span></div>
+                    <div class="welcome-format"><span class="wf-name">Lifestyle Ad</span><span class="wf-spec">9:16 / 4-15s</span></div>
+                    <div class="welcome-format"><span class="wf-name">Greenscreen</span><span class="wf-spec">9:16 / 4-15s</span></div>
+                </div>
+            </div>
+
+            <button class="welcome-cta" onclick="dismissWelcome()">Get Started</button>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <div>
+                    <h1>Control Center</h1>
+                    <p class="header-sub">Manage your creative assets for AI video ad generation</p>
+                </div>
+                <div class="header-stats">
+                    <a href="https://app.enhancor.ai/api-dashboard" target="_blank" class="btn btn-api" title="Get your Enhancor API key">Get API Key</a>
+                    <button class="help-btn" onclick="showWelcome()" title="How it works">?</button>
+                    <div class="stat-pill"><span id="total-assets">0</span> assets</div>
+                    <div class="stat-pill product-pill"><span id="total-products">0</span> products</div>
+                    <div class="stat-pill subject-pill"><span id="total-subjects">0</span> subjects</div>
+                    <div class="stat-pill mood-pill"><span id="total-moods">0</span> moods</div>
+                    <div class="stat-pill audio-pill"><span id="total-audio">0</span> audio</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Upload Section -->
+        <section class="upload-section">
+            <div class="section-header">
+                <h2>Upload</h2>
+                <p class="section-desc">Drag images or click to browse. Choose the category that best fits each asset.</p>
+            </div>
+            <div class="drop-zones">
+                <div class="drop-zone" data-category="product">
+                    <input type="file" accept="image/*" multiple>
+                    <div class="drop-zone-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    </div>
+                    <div class="drop-zone-label">Products</div>
+                    <div class="drop-zone-hint">Packaging, bottles, devices, screenshots</div>
+                </div>
+                <div class="drop-zone" data-category="subject">
+                    <input type="file" accept="image/*" multiple>
+                    <div class="drop-zone-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <div class="drop-zone-label">Subjects</div>
+                    <div class="drop-zone-hint">Influencers, creators, talent references</div>
+                </div>
+                <div class="drop-zone" data-category="mood">
+                    <input type="file" accept="image/*" multiple>
+                    <div class="drop-zone-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    </div>
+                    <div class="drop-zone-label">Moods</div>
+                    <div class="drop-zone-hint">Lifestyle scenes, aesthetic references</div>
+                </div>
+                <div class="drop-zone" data-category="audio">
+                    <input type="file" accept="audio/*" multiple>
+                    <div class="drop-zone-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    </div>
+                    <div class="drop-zone-label">Audio</div>
+                    <div class="drop-zone-hint">Voice references, influencer audio samples</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Processing Queue -->
+        <section id="queue-section" class="queue-section" style="display:none">
+            <div class="section-header">
+                <h2>Queue <span class="queue-count" id="queue-count">0</span></h2>
+                <button class="btn btn-primary btn-sm" onclick="uploadAll()">Add All to Library</button>
+            </div>
+            <div id="queue-list" class="queue-list"></div>
+        </section>
+
+        <!-- Library -->
+        <section class="library-section">
+            <div class="section-header">
+                <h2>Library</h2>
+            </div>
+            <div id="analyze-bar" class="analyze-bar" style="display:none">
+                <div class="analyze-left">
+                    <div class="analyze-dot"></div>
+                    <div>
+                        <span class="analyze-count"></span>
+                        <div class="analyze-hint">Paste this in Claude to analyze them:</div>
+                    </div>
+                </div>
+                <div class="analyze-copy-wrap">
+                    <code class="analyze-command" id="analyze-command">analyze my new assets</code>
+                    <button class="btn btn-primary btn-sm" onclick="copyAnalyzePrompt()">Copy</button>
+                </div>
+            </div>
+            <div id="library"></div>
+        </section>
+
+        <!-- Outputs -->
+        <section class="outputs-section">
+            <div class="section-header">
+                <h2>Outputs</h2>
+                <div class="header-stats">
+                    <div class="stat-pill"><span id="total-videos">0</span> videos</div>
+                    <div class="stat-pill"><span id="total-runs">0</span> runs</div>
+                </div>
+            </div>
+            <div id="outputs"></div>
+        </section>
+
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/app/app.js"></script>
+</body>
+</html>

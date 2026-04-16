@@ -1,0 +1,23 @@
+# Environment
+.env
+.env.local
+
+# Fetched from API at runtime (not in repo)
+CLAUDE.md
+
+# Local settings (may contain API keys in allowed commands)
+.claude/settings.local.json
+
+# Generated outputs
+projects/*/
+!projects/.gitkeep
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
